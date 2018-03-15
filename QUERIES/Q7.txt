@@ -1,0 +1,3 @@
+select Distinct R.Refund_ID,O.Order_ID,R.Refund_Amt,R.Refund_Reason from INVENTORY as I, ORDER_FORM as O , REFUND as R
+where O.Order_ID = R.Order_ID
+ and O.Item_Status = 'Returned'

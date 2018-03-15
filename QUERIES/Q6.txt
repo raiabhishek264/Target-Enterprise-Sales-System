@@ -1,0 +1,4 @@
+select I.Item_ID,O.Order_ID, I.Category, I.Sub_Category, I.Price, I.Item_Status, I.Item_Qty_Available, I.Item_Qty_Sold,
+O.Date_Ordered
+from INVENTORY as I, ORDER_FORM as O
+where O.Item_ID = I.Item_ID

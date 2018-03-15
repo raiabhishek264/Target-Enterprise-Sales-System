@@ -1,0 +1,10 @@
+Select O.Order_ID,O.Customer_ID,I.Item_ID,C.Clerk_ID,O.Date_Ordered,O.Delivery_Type,O.Order_Method,
+O.Payment_Type,O.Total_Price,O.Status_Code,O.Item_Status,I.Category,I.Sub_Category,I.Price,I.Color,I.Size,
+P.Pmt_Type,P.Pmt_Amt,P.Credit_Card_Number,P.Exp_Date,P.Name_On_Card,P.Check_Number,P.Postal_Order_Number
+from DEPARTMENT as D, ORDER_FORM as O, CLERK as C, INVENTORY as I, PAYMENT as P
+where C.Clerk_ID = O.Clerk_ID
+and C.Dept_ID = D.Dept_ID
+and O.Item_ID = I.Item_ID
+and O.Order_ID = P.Order_ID
+
+

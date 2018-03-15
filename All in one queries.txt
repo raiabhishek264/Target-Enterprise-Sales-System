@@ -1,0 +1,410 @@
+/********************************************************************************/
+/*																				*/
+/*	Target Enterprise Pty Ltd													*/
+/*																				*/
+/*	Target Online Retail Project Create Table Queries							*/
+/*																				*/
+/*	Microsoft SQL Server 2008 R2/2012 code solutions							*/
+/********************************************************************************/
+
+
+CREATE TABLE CUSTOMER (
+	Customer_ID    int             NOT NULL, IDENTITY(1,1),
+	Firstname      nvarchar(50)    NOT NULL,
+	Lastname       nvarchar(50)    NOT NULL,
+	Phone_Number   numeric(18, 0)  NOT NULL,
+	Email          nvarchar(50)    NOT NULL,
+	Fax            nvarchar(50)    NOT NULL,
+	Street         nvarchar(50)    NOT NULL,
+	City           nvarchar(50)    NOT NULL,
+	State          nvarchar(50)    NOT NULL,
+	Zip            int             NOT NULL,
+        Constraint     CustomerPK      PRIMARY KEY (Customer_ID)
+        );
+
+
+
+CREATE TABLE ORDER_FORM (
+	Order_ID         int          NOT NULL, IDENTITY(1,1),
+	Customer_ID      int          NOT NULL,
+	Item_ID          int          NOT NULL,
+	Clerk_ID         int          NOT NULL,
+	Date_Ordered     date         NOT NULL,
+	Delivery_Type    nvarchar(50) NOT NULL,
+	Order_Method     nvarchar(50) NOT NULL,
+	Payment_Type     nvarchar(50) NOT NULL,
+	Total_Price      int          NOT NULL,
+	Status_Code      int          NOT NULL,
+	Item_Status      nvarchar(50) NOT NULL,
+        Constraint       Order_FormPK Primary Key (Order_ID),
+        Constraint       CustomerFK   Foreign key (Customer_ID)
+                                      References CUSTOMER (Customer_ID)
+                                      ON UPDATE NO ACTION
+				      ON DELETE NO ACTION,
+        Constraint       ItemFK       Foreign key (Item_ID)
+                                      References INVENTORY (Item_ID)
+                                      ON UPDATE NO ACTION
+				      ON DELETE NO ACTION,
+        Constraint       ClerkFK      Foreign key (Clerk_ID)
+                                      References CLERK (Clerk_ID)
+                                      ON UPDATE NO ACTION
+				      ON DELETE NO ACTION,
+        Constraint       Order_StatusFK   Foreign key (Status_Code)
+                                      References ORDER_STATUS (Status_Code)
+                                      ON UPDATE NO ACTION
+				      ON DELETE NO ACTION
+        );
+
+
+
+CREATE TABLE CLERK(
+	Clerk_ID    int          NOT NULL, IDENTITY(1,1),
+	Dept_ID     int          NOT NULL,
+	Store_ID    int          NOT NULL,
+	Clerk_Type  nvarchar(50) NOT NULL,
+	Clerk_Name  nvarchar(50) NOT NULL,
+	Clerk_Dept  nvarchar(50) NOT NULL
+        Constraint  ClerkPK      Primary Key (Clerk_ID),
+        Constraint       DepartmentFK   Foreign key (Dept_ID)
+                                      References DEPARTMENT (Dept_ID)
+                                      ON UPDATE NO ACTION
+				      ON DELETE NO ACTION,
+        Constraint       StoreFK        Foreign key (Store_ID)
+                                      References STORE (Store_ID)
+                                      ON UPDATE NO ACTION
+				      ON DELETE NO ACTION
+        );
+
+
+
+CREATE TABLE DEPARTMENT(
+	Dept_ID         int             NOT NULL, IDENTITY(1,1),
+	Dept_Name       nvarchar(50)    NOT NULL,
+	Dept_Phone      numeric(18, 0)  NOT NULL,
+	Dept_Fax        nvarchar(50)    NOT NULL,
+	Dept_Email      nvarchar(50)    NOT NULL,
+        Constraint      DepartmentPK    Primary Key (Dept_ID)
+        );
+
+
+CREATE TABLE DISPATCH(
+	Dispatch_ID      int  NOT NULL, IDENTITY(1,1),
+	Order_ID         int  NOT NULL,
+	Item_ID          int  NOT NULL,
+	Customer_ID      int  NOT NULL,
+	Ship_Date        date NOT NULL,
+        Constraint       DispatchPK    Primary Key (Dispatch_ID),
+        Constraint       Order_FormFK   Foreign key (Order_ID)
+                                      References ORDER_FORM (Order_ID)
+                                      ON UPDATE NO ACTION
+				      ON DELETE NO ACTION,
+        Constraint       InventoryFK   Foreign key (Item_ID)
+                                      References INVENTORY (Item_ID)
+                                      ON UPDATE NO ACTION
+				      ON DELETE NO ACTION,
+        Constraint       CustomerFK   Foreign key (Customer_ID)
+                                      References CUSTOMER (Customer_ID)
+                                      ON UPDATE NO ACTION
+				      ON DELETE NO ACTION
+        );
+
+
+CREATE TABLE INVENTORY(
+	Item_ID          int NOT NULL, IDENTITY(1,1),
+	Store_ID         int NOT NULL,
+	Category         nvarchar(50) NOT NULL,
+	Sub_Category     nvarchar(50) NOT NULL,
+	Price            int NOT NULL,
+	Color            nvarchar(50) NOT NULL,
+	Size             nvarchar(50) NOT NULL,
+	Item_Status      nvarchar(50) NOT NULL,
+	Item_Qty_Available int NOT NULL,
+	Item_Qty_Sold      int NOT NULL,
+        Constraint         InventoryPK    Primary Key (Item_ID),
+        Constraint         StoreFK   Foreign key (Store_ID)
+                                      References STORE (Store_ID)
+                                      ON UPDATE NO ACTION
+				      ON DELETE NO ACTION
+        );
+
+
+CREATE TABLE ORDER_STATUS(
+	Status_Code int          NOT NULL, IDENTITY(1,1),
+	Status_Desc nvarchar(50) NOT NULL,
+        Constraint  Order_StatusPK    Primary Key (Status_Code)
+        );
+
+
+CREATE TABLE PAYMENT(
+	Pmt_ID              int            NOT NULL, IDENTITY(1,1),
+	Order_ID            int            NULL,
+	Customer_ID         int            NULL,
+	Pmt_Type            nvarchar(50)   NULL,
+	Pmt_Amt             int            NULL,
+	Credit_Card_Number  numeric(18, 0) NULL,
+	Name_On_Card        nvarchar(50)   NULL,
+	Exp_Date            date           NULL,
+	Check_Number        numeric(18, 0) NULL,
+	Postal_Order_Number numeric(18, 0) NULL,
+        Constraint          PaymentPK      Primary Key (Pmt_ID),
+        Constraint       Order_FormFK   Foreign key (Order_ID)
+                                      References ORDER_FORM (Order_ID)
+                                      ON UPDATE NO ACTION
+				      ON DELETE NO ACTION,
+        Constraint       CustomerFK     Foreign key (Customer_ID)
+                                      References CUSTOMER (Customer_ID)
+                                      ON UPDATE NO ACTION
+				      ON DELETE NO ACTION,
+        Constraint       PaymentFK      Foreign key (Pmt_ID)
+                                      References PAYMENT (PMT_ID)
+                                      ON UPDATE NO ACTION
+				      ON DELETE NO ACTION
+        );
+
+
+CREATE TABLE REFUND(
+	Refund_ID         int          NOT NULL, IDENTITY(1,1),
+	Order_ID          int          NOT NULL,
+	Customer_ID       int          NOT NULL,
+	Pmt_ID            int          NOT NULL,
+	Item_ID           int          NOT NULL,
+	Refund_Amt        int          NOT NULL,
+	Refund_Reason     nvarchar(50) NOT NULL,
+        Constraint        RefundPK     Primary Key (Refund_ID),
+        Constraint       Order_FormFK   Foreign key (Order_ID)
+                                      References ORDER_FORM (Order_ID)
+                                      ON UPDATE NO ACTION
+				      ON DELETE NO ACTION,
+        Constraint       CustomerFK   Foreign key (Customer_ID)
+                                      References CUSTOMER (Customer_ID)
+                                      ON UPDATE NO ACTION
+				      ON DELETE NO ACTION,
+        Constraint       PaymentFK   Foreign key (Pmt_ID)
+                                      References PAYMENT (Pmt_ID)
+                                      ON UPDATE NO ACTION
+				      ON DELETE NO ACTION,
+        Constraint       InventoryFK   Foreign key (Item_ID)
+                                      References INVENTORY (Item_ID)
+                                      ON UPDATE NO ACTION
+				      ON DELETE NO ACTION
+        );
+
+
+CREATE TABLE SHIPPING( 
+	Shipping_ID        int          NOT NULL, IDENTITY(1,1),
+	Order_ID           int          NOT NULL,
+	Ship_Street        nvarchar(50) NOT NULL,
+	Ship_City          nvarchar(50) NOT NULL,
+	Ship_State         nvarchar(50) NOT NULL,
+	Ship_Zip           int          NOT NULL,
+	Ship_Date          date         NOT NULL,
+        Constraint         ShippingPK   Primary Key (Shipping_ID),
+        Constraint       Order_FormFK   Foreign key (Order_ID)
+                                      References ORDER_FORM (Order_ID)
+                                      ON UPDATE NO ACTION
+				      ON DELETE NO ACTION
+        );
+
+
+CREATE TABLE STORE( 
+	Store_ID          int            NOT NULL, IDENTITY(1,1),
+	Item_ID           int            NOT NULL,
+	Phone             numeric(18, 0) NOT NULL,
+	Fax               nvarchar(50)   NOT NULL,
+	Email             nvarchar(50)   NOT NULL,
+	Street            nvarchar(50)   NOT NULL,
+	City              nvarchar(50)   NOT NULL,
+	State             nvarchar(50)   NOT NULL,
+	Zip               int            NOT NULL,
+        Constraint        StorePK        Primary Key (Store_ID),
+        Constraint       InventoryFK   Foreign key (Item_ID)
+                                      References INVENTORY (Item_ID)
+                                      ON UPDATE NO ACTION
+				      ON DELETE NO ACTION
+        ); 
+
+
+
+/* Insert queries */
+
+Insert into CUSTOMER values (1,'David','Miller',7472678912,'david@gmail.com','dav133,'Yorba Linda','Fullerton','CA',92831)
+Insert into CUSTOMER values (1,'David','Miller',7472678912,'david@gmail.com','dav133,'Yorba Linda','Fullerton','CA',92831)
+Insert into CUSTOMER values (1,'David','Miller',7472678912,'david@gmail.com','dav133,'Yorba Linda','Fullerton','CA',92831)
+Insert into CUSTOMER values (1,'David','Miller',7472678912,'david@gmail.com','dav133,'Yorba Linda','Fullerton','CA',92831)
+Insert into CUSTOMER values (1,'David','Miller',7472678912,'david@gmail.com','dav133,'Yorba Linda','Fullerton','CA',92831)
+
+Insert into DEPARTMENT(1,'Marketing',4567891236,'market134','market@target.com')
+Insert into DEPARTMENT(1,'Marketing',4567891236,'market134','market@target.com')
+Insert into DEPARTMENT(1,'Marketing',4567891236,'market134','market@target.com')
+Insert into DEPARTMENT(1,'Marketing',4567891236,'market134','market@target.com')
+Insert into DEPARTMENT(1,'Marketing',4567891236,'market134','market@target.com')
+
+Insert into ORDER_STATUS(1,'New')
+Insert into ORDER_STATUS(1,'New')
+Insert into ORDER_STATUS(1,'New')
+Insert into ORDER_STATUS(1,'New')
+Insert into ORDER_STATUS(1,'New')
+
+Insert into ORDER_FORM(1,1,2,3,'2017-02-03','Express','Phone','Credit Card',40,1,'Dispatched')
+Insert into ORDER_FORM(1,1,2,3,'2017-02-03','Express','Phone','Credit Card',40,1,'Dispatched')
+Insert into ORDER_FORM(1,1,2,3,'2017-02-03','Express','Phone','Credit Card',40,1,'Dispatched')
+Insert into ORDER_FORM(1,1,2,3,'2017-02-03','Express','Phone','Credit Card',40,1,'Dispatched')
+Insert into ORDER_FORM(1,1,2,3,'2017-02-03','Express','Phone','Credit Card',40,1,'Dispatched')
+
+Insert into CLERK(1,2,3,'Dispatch','Balli','Dispatch')
+Insert into CLERK(1,2,3,'Dispatch','Balli','Dispatch')
+Insert into CLERK(1,2,3,'Dispatch','Balli','Dispatch')
+Insert into CLERK(1,2,3,'Dispatch','Balli','Dispatch')
+Insert into CLERK(1,2,3,'Dispatch','Balli','Dispatch')
+
+Insert into INVENTORY(1,2,'Camera','DSLR',40,'Black',10,'Shipped',100,90)
+Insert into INVENTORY(1,2,'Camera','DSLR',40,'Black',10,'Shipped',100,90)
+Insert into INVENTORY(1,2,'Camera','DSLR',40,'Black',10,'Shipped',100,90)
+Insert into INVENTORY(1,2,'Camera','DSLR',40,'Black',10,'Shipped',100,90)
+Insert into INVENTORY(1,2,'Camera','DSLR',40,'Black',10,'Shipped',100,90)
+
+Insert into DISPATCH(1,1,2,3,'2017-01-03')
+Insert into DISPATCH(1,1,2,3,'2017-01-03')
+Insert into DISPATCH(1,1,2,3,'2017-01-03')
+Insert into DISPATCH(1,1,2,3,'2017-01-03')
+Insert into DISPATCH(1,1,2,3,'2017-01-03')
+
+Insert into PAYMENT(1,2,1'Check',50,NULL,NULL,NULL,12346588,65463215)
+Insert into PAYMENT(1,2,1'Check',50,NULL,NULL,NULL,12346588,65463215)
+Insert into PAYMENT(1,2,1'Check',50,NULL,NULL,NULL,12346588,65463215)
+Insert into PAYMENT(1,2,1'Check',50,NULL,NULL,NULL,12346588,65463215)
+Insert into PAYMENT(1,2,1'Check',50,NULL,NULL,NULL,12346588,65463215)
+
+Insert into REFUND(1,2,5,1,2,40,'Defective')
+Insert into REFUND(1,2,5,1,2,40,'Defective')
+Insert into REFUND(1,2,5,1,2,40,'Defective')
+Insert into REFUND(1,2,5,1,2,40,'Defective')
+Insert into REFUND(1,2,5,1,2,40,'Defective')
+
+Insert into SHIPPING(1,2,'Yorba Linda','Fullerton','CA',92831,'2017-03-12')
+Insert into SHIPPING(1,2,'Yorba Linda','Fullerton','CA',92831,'2017-03-12')
+Insert into SHIPPING(1,2,'Yorba Linda','Fullerton','CA',92831,'2017-03-12')
+Insert into SHIPPING(1,2,'Yorba Linda','Fullerton','CA',92831,'2017-03-12')
+Insert into SHIPPING(1,2,'Yorba Linda','Fullerton','CA',92831,'2017-03-12')
+
+Insert into STORE(1,2,1234567896,'abc123','Store1@target.com','Yorba Linda','Fullerton','CA',92831)
+Insert into STORE(1,2,1234567896,'abc123','Store1@target.com','Yorba Linda','Fullerton','CA',92831)
+Insert into STORE(1,2,1234567896,'abc123','Store1@target.com','Yorba Linda','Fullerton','CA',92831)
+Insert into STORE(1,2,1234567896,'abc123','Store1@target.com','Yorba Linda','Fullerton','CA',92831)
+Insert into STORE(1,2,1234567896,'abc123','Store1@target.com','Yorba Linda','Fullerton','CA',92831)
+
+
+
+
+
+/* Queries in Scope of the System  */
+
+SELECT Order_ID
+      ,Customer_ID
+      ,Item_ID
+      ,Clerk_ID
+      ,Date_Ordered
+      ,Delivery_Type
+      ,Order_Method
+      ,Payment_Type
+      ,Total_Price
+      ,Status_Code
+      ,Item_Status
+  FROM dbo.ORDER_FORM
+where Status_Code = 1
+
+
+SELECT * FROM ORDER_FORM
+
+
+
+Select I.Item_ID, I.Item_Status, OS.Status_Desc,C.Firstname, C.Lastname,C.Street,
+C.City, C.State, C.Zip, O.Date_Ordered,O.Delivery_Type, O.Order_Method, O.Payment_Type,
+O.Total_Price,I.Category, I.Sub_Category
+from ORDER_FORM as O, INVENTORY as I, ORDER_STATUS as OS, CUSTOMER as C
+where O.Item_ID = I.Item_ID
+and O.Status_Code = OS.Status_Code
+and O.Customer_ID = C.Customer_ID
+
+
+
+Select O.Order_ID,O.Customer_ID,I.Item_ID,C.Clerk_ID,O.Date_Ordered,O.Delivery_Type,O.Order_Method,
+O.Payment_Type,O.Total_Price,O.Status_Code,O.Item_Status,I.Category,I.Sub_Category,I.Price,I.Color,I.Size,
+P.Pmt_Type,P.Pmt_Amt,P.Credit_Card_Number,P.Exp_Date,P.Name_On_Card,P.Check_Number,P.Postal_Order_Number
+from DEPARTMENT as D, ORDER_FORM as O, CLERK as C, INVENTORY as I, PAYMENT as P
+where C.Clerk_ID = O.Clerk_ID
+and C.Dept_ID = D.Dept_ID
+and O.Item_ID = I.Item_ID
+and O.Order_ID = P.Order_ID
+
+
+
+select D.Dispatch_ID,D.Order_ID,D.Item_ID,D.Customer_ID,D.Ship_Date,S.Status_Desc, O.Item_Status from DISPATCH as D,ORDER_STATUS as S, ORDER_FORM as O
+where D.Order_ID = O.Order_ID
+and O.Status_Code = S.Status_Code
+and O.Item_Status = 'Shipped'
+
+
+
+select Distinct D.Item_ID,D.Ship_Date,S.Status_Desc, O.Item_Status,I.Item_Qty_Available,I.Item_Qty_Sold 
+from DISPATCH as D,ORDER_STATUS as S, ORDER_FORM as O,INVENTORY as I
+where 
+D.Order_ID = O.Order_ID
+and O.Status_Code = S.Status_Code
+and O.Item_Status = 'Shipped'
+and O.Item_ID = I.Item_ID
+
+
+
+select I.Item_ID,O.Order_ID, I.Category, I.Sub_Category, I.Price, I.Item_Status, I.Item_Qty_Available, I.Item_Qty_Sold,
+O.Date_Ordered
+from INVENTORY as I, ORDER_FORM as O
+where O.Item_ID = I.Item_ID
+
+
+
+select Distinct R.Refund_ID,O.Order_ID,R.Refund_Amt,R.Refund_Reason from INVENTORY as I, ORDER_FORM as O , REFUND as R
+where O.Order_ID = R.Order_ID
+and O.Item_Status = 'Returned'
+
+
+
+Select Category, max(Item_Qty_Sold) as Item_Qty_Sold from INVENTORY group by Category order by Item_Qty_Sold desc
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

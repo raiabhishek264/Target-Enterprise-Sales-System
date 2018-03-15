@@ -1,0 +1,5 @@
+select D.Dispatch_ID,D.Order_ID,D.Item_ID,D.Customer_ID,D.Ship_Date,S.Status_Desc, O.Item_Status from DISPATCH as D,ORDER_STATUS as S, ORDER_FORM as O
+where D.Order_ID = O.Order_ID
+and O.Status_Code = S.Status_Code
+--and S.Status_Desc='Complete'
+and O.Item_Status = 'Shipped'

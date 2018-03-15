@@ -1,0 +1,7 @@
+select Distinct D.Item_ID,D.Ship_Date,S.Status_Desc, O.Item_Status,I.Item_Qty_Available,I.Item_Qty_Sold 
+from DISPATCH as D,ORDER_STATUS as S, ORDER_FORM as O,INVENTORY as I
+where 
+D.Order_ID = O.Order_ID
+and O.Status_Code = S.Status_Code
+and O.Item_Status = 'Shipped'
+and O.Item_ID = I.Item_ID

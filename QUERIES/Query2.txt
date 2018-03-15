@@ -1,0 +1,7 @@
+Select I.Item_ID, I.Item_Status, OS.Status_Desc,C.Firstname, C.Lastname,C.Street,
+C.City, C.State, C.Zip, O.Date_Ordered,O.Delivery_Type, O.Order_Method, O.Payment_Type,
+O.Total_Price,I.Category, I.Sub_Category
+from ORDER_FORM as O, INVENTORY as I, ORDER_STATUS as OS, CUSTOMER as C
+where O.Item_ID = I.Item_ID
+and O.Status_Code = OS.Status_Code
+and O.Customer_ID = C.Customer_ID

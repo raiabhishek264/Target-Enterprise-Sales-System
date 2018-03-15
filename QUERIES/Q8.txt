@@ -1,0 +1,3 @@
+ 
+
+Select Category, max(Item_Qty_Sold) as Item_Qty_Sold from INVENTORY group by Category order by Item_Qty_Sold desc

@@ -1,0 +1,15 @@
+SELECT [Order_ID]
+      ,[Customer_ID]
+      ,[Item_ID]
+      ,[Clerk_ID]
+      ,[Date_Ordered]
+      ,[Delivery_Type]
+      ,[Order_Method]
+      ,[Payment_Type]
+      ,[Total_Price]
+      ,[Status_Code]
+      ,[Item_Status]
+  FROM [dbo].[ORDER_FORM]
+
+
+where [Status_Code] = 1
